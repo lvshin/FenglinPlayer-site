@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="风琳 Player 常见问题：缓存、音质与 VIP、歌词设置等，与产品文档一致。" />
+  <title>风琳 Player — 常见问题</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --title: #111827;
+      --border: #e5e7eb;
+      --section-bg: #f9fafb;
+      --accent: #2f9ec4;
+      --table-head: #eef4fa;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.8;
+      font-size: 16px;
+    }
+
+    main {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 40px 20px 64px;
+    }
+
+    header {
+      margin-bottom: 36px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      color: var(--title);
+      font-size: 32px;
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    h2 {
+      margin-top: 40px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      color: var(--title);
+      font-size: 22px;
+      line-height: 1.4;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h3 {
+      margin-top: 28px;
+      margin-bottom: 12px;
+      color: var(--title);
+      font-size: 18px;
+      line-height: 1.5;
+    }
+
+    .answer-label {
+      margin: 8px 0 0;
+      font-weight: 600;
+      color: var(--title);
+    }
+
+    p {
+      margin: 12px 0;
+    }
+
+    ul, ol {
+      margin: 12px 0 12px 24px;
+      padding: 0;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    strong {
+      color: var(--title);
+    }
+
+    code {
+      font-family: ui-monospace, "Cascadia Mono", "Segoe UI Mono", "Microsoft YaHei Mono", monospace;
+      font-size: 0.92em;
+      background: var(--section-bg);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    hr {
+      margin: 32px 0;
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 15px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--table-head);
+      font-weight: 600;
+      color: var(--title);
+    }
+
+    tr:nth-child(even) td {
+      background: #fcfcfd;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 16px 0;
+    }
+
+    footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    footer p {
+      margin: 8px 0;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+      main {
+        padding: 28px 16px 48px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      body {
+        font-size: 15px;
+      }
+
+      th, td {
+        padding: 8px 10px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>常见问题</h1>
+    <div class="meta">
+      与仓库 <code>docs/常见问题.md</code> 同源；部署到 <code>AppWebLinks.FAQ_URL</code> 所指地址后，应用内「常见问题」将显示本页。
+    </div>
+  </header>
+
+  <section>
+    <h2>缓存与存储</h2>
+
+    <h3>Q：缓存超出「缓存上限」后，应用会怎么删文件？</h3>
+    <p class="answer-label">A：</p>
+    <p>
+      采用「<strong>按修改时间从旧到新删除</strong>」的策略，直到<strong>封面缓存 + 歌曲流缓存</strong>的合计占用不超过你在设置里选择的上限为止。
+    </p>
+    <p>具体逻辑（与 <code>MediaCacheTrim</code> 实现一致）：</p>
+    <ol>
+      <li><strong>统计范围</strong>：同时扫描两个目录下的<strong>普通文件</strong>（封面磁盘缓存目录、歌曲流磁盘缓存目录），把它们的体积相加得到总占用。</li>
+      <li><strong>触发条件</strong>：总占用 <strong>大于</strong> 当前设定的上限（字节数 = 上限 MB × 1024 × 1024）时才会删；未超出则不做任何删除。</li>
+      <li><strong>排序方式</strong>：把所有缓存文件按 <strong><code>mtime</code>（最后修改时间）升序</strong>排序，<strong>最久未更新</strong>的文件排在最前。</li>
+      <li><strong>删除顺序</strong>：从队列头部开始逐个 <code>unlink</code>（删除文件），每删一个就从总占用里减去该文件大小；<strong>循环直到总占用 ≤ 上限</strong>或没有更多文件可删。</li>
+      <li><strong>类型不区分</strong>：封面与歌曲流混在同一列表里按时间排序，<strong>不会</strong>单独「优先保封面」或「优先保歌曲」；谁更旧谁先被删。</li>
+    </ol>
+
+    <h3>Q：什么时候会执行一次「按上限裁剪」？</h3>
+    <p class="answer-label">A：</p>
+    <p>主要在两类时机：</p>
+    <ul>
+      <li><strong>写入缓存成功后</strong>：例如刚下载完并落盘的封面、或后台预取完成的歌曲流文件，写盘成功后会按当前偏好里的上限尝试裁剪。</li>
+      <li><strong>在设置里改小上限或从「无限制」改为有上限</strong>：会立刻按新上限尝试裁剪（与设置页逻辑一致）。</li>
+    </ul>
+    <p>若你选择 <strong>「无限制」</strong>，则<strong>不会</strong>因上限自动删除缓存文件。</p>
+
+    <h3>Q：「清理缓存」和「超上限自动删」有什么区别？</h3>
+    <p class="answer-label">A：</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>操作</th>
+            <th>行为</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>清理缓存</strong>（设置页按钮）</td>
+            <td>清空上述两个目录下的<strong>全部</strong>缓存文件（不删目录本身），与是否超上限无关。</td>
+          </tr>
+          <tr>
+            <td><strong>超上限自动删</strong></td>
+            <td>仅在合计体积<strong>超过</strong>上限时触发；只删一部分，且优先删 <strong>mtime 更旧</strong>的文件，直到体积回到上限以内。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Q：「本地歌曲」列表是什么？为什么有时播过的歌还没出现？</h3>
+    <p class="answer-label">A：</p>
+    <p>
+      列表不是扫磁盘猜曲名，而是读 <strong><code>StreamCacheIndex</code></strong>（<code>filesDir</code> 下 <code>fenglin_stream_cache_index.json</code>）。<strong>完整</strong>的判定与流文件一致：体积不小于约 4KB 的整包下载/落盘；索引在 <strong>预取写盘成功</strong>或<strong>某次播放入口命中了已缓存的 <code>fd://</code> 流</strong>时更新。被裁剪或清理删掉的流文件，对应索引项会一并清理；<strong>清理缓存</strong>也会清空该索引。同一首歌在 NAS 上若同时存在<strong>源流</strong>与<strong>转码</strong>各一份缓存，列表里可能出现两行（<code>cacheKey</code> 不同）；再次播放可补全旧有 <code>.bin</code> 但从未写过索引的条目（自愈）。
+    </p>
+
+    <h3>Q：删的是哪些文件？会动到 NAS 上的原文件吗？</h3>
+    <p class="answer-label">A：</p>
+    <p>仅删除<strong>本机应用缓存目录</strong>里已落盘的缓存文件，<strong>不会</strong>修改或删除群晖 / NAS 上的音乐或图片源文件。</p>
+  </section>
+
+  <hr />
+
+  <section>
+    <h2>播放与音质（含 VIP）</h2>
+
+    <h3>Q：设置里「开启无损音质」和 NAS 上实际拉流方式是什么关系？</h3>
+    <p class="answer-label">A：</p>
+    <p>设置页开关与偏好键 <code>song_transcode_enabled</code> <strong>含义相反</strong>（与 <code>PreferencesUtil.getSongTranscodeEnabled</code> 一致）：</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>设置「开启无损音质」</th>
+            <th><code>song_transcode_enabled</code></th>
+            <th>非整轨歌曲通常请求</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>开</strong></td>
+            <td><code>false</code></td>
+            <td>优先 <strong>源流</strong>（不强制 NAS 转 MP3）</td>
+          </tr>
+          <tr>
+            <td><strong>关</strong></td>
+            <td><code>true</code></td>
+            <td><strong>NAS 转码 MP3</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>整轨</strong>（歌曲 <code>id</code> 含 <code>_v_</code>）由群晖规则决定，<strong>始终走转码 MP3</strong>，与上述开关无关。</p>
+
+    <h3>Q：VIP 会不会绕过「开启无损音质」？</h3>
+    <p class="answer-label">A：</p>
+    <p><strong>不会。</strong>有效 VIP 与普通用户<strong>共用</strong>同一套「开启无损音质」读写与播放决策基线；不再因 VIP 单独固定走 NAS 源流。</p>
+
+    <h3>Q：我从未在设置里动过「开启无损音质」，默认是什么？</h3>
+    <p class="answer-label">A：</p>
+    <p>仅在<strong>从未写入过</strong> <code>song_transcode_enabled</code>时，默认值随<strong>当前是否有效 VIP</strong>变化：</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>当前身份</th>
+            <th>默认「开启无损音质」</th>
+            <th>默认转码偏好（<code>getSongTranscodeEnabled</code>）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>非 VIP</strong></td>
+            <td><strong>关</strong>（偏省流量，NAS 转 MP3）</td>
+            <td><code>true</code></td>
+          </tr>
+          <tr>
+            <td><strong>有效 VIP</strong></td>
+            <td><strong>开</strong>（偏音质，优先源流）</td>
+            <td><code>false</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>用户一旦在设置里切换过该项，<strong>以后始终以落盘值为准</strong>；仅升降 VIP <strong>不会</strong>自动改写该偏好。</p>
+
+    <h3>Q：关掉「开启无损音质」后，以前下好的源流缓存还会用吗？</h3>
+    <p class="answer-label">A：</p>
+    <p>会。只要本机仍有<strong>有效</strong>的源流磁盘缓存（与 <code>stream:src:</code> 键对应，且通过最小体积等校验），起播会<strong>优先用该本地 fd</strong>，不会只因为当前偏好是「转码」就再拉一条 MP3；<strong>清理缓存</strong>或该文件被裁剪删除、不再有效后，才会按设置去 NAS 拉转码流。</p>
+
+    <h3>Q：什么是「非 Wi‑Fi 自动转码」？和本地缓存有什么关系？</h3>
+    <p class="answer-label">A：</p>
+    <p>该开关<strong>仅有效 VIP</strong>可用，对应偏好 <code>vip_transcode_on_non_wifi</code>（默认 <strong>关</strong>）。</p>
+    <ul>
+      <li><strong>非 Wi‑Fi / 非以太</strong>（如蜂窝；与 Wi‑Fi、以太相对的判定见应用内 <code>NetworkLinkTypeUtil</code>）时：
+        <ul>
+          <li>若本机已有<strong>该曲的源流</strong>磁盘缓存（与「是否转码」无关的另一套缓存键，即源流 <code>cacheKey</code>），则 <strong>始终优先用本地 <code>fd</code> 播放</strong>，<strong>无需</strong>打开任何开关，也<strong>不另拉</strong>一条 MP3 流。</li>
+          <li>若<strong>没有</strong>上述本地源流缓存，且你打开了「<strong>非 Wi‑Fi 自动转码</strong>」，则在该网络环境下会 <strong>强制按 NAS 转 MP3</strong>拉流，以便省流量（可能与您「开启无损音质」下的源流偏好不一致）。</li>
+        </ul>
+      </li>
+      <li>在 <strong>Wi‑Fi 或以太</strong>下：<strong>不做</strong>上述「无缓存时强制转码」叠加，只按「开启无损音质」与整轨规则决定。</li>
+    </ul>
+
+    <h3>Q：同一首歌在 Wi‑Fi 和蜂窝下缓存会重复占空间吗？</h3>
+    <p class="answer-label">A：</p>
+    <p>可能。<strong>源流</strong>与 <strong>转码 MP3</strong>使用不同的缓存键（与 <code>SongStreamCache.buildCacheKey</code> 中的转码标志一致），网络策略变化后可能各有一份文件；上限裁剪仍按「封面 + 流缓存」合计与文件 <code>mtime</code> 统一处理（见上文「缓存与存储」）。</p>
+
+    <h3>Q：源流和转码会长期各占一份吗？</h3>
+    <p class="answer-label">A：</p>
+    <p><strong>非整轨</strong>曲目在<strong>新写入或确认有效</strong>的源流缓存后，会自动删掉同曲的转码 MP3 文件并更新索引；进入「本地歌曲」页也会按索引再扫一遍，清掉历史上遗留的双份。<strong>整轨</strong>（<code>id</code> 含 <code>_v_</code>）只走 NAS 转码播，<strong>不会</strong>删 MP3。</p>
+  </section>
+
+  <hr />
+
+  <section>
+    <h2>歌词与设置</h2>
+
+    <h3>Q：「获取在线歌词」打开和关闭有什么区别？</h3>
+    <p class="answer-label">A：</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>开关</th>
+            <th>行为（与 <code>PlaybackService.runLyricsLoadAsync</code> 一致）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>打开</strong>（默认）</td>
+            <td>在已登录 NAS 的前提下，按下面「优先使用内嵌歌词」决定顺序，可读取 <strong>NAS 歌词接口</strong>（<code>SYNO.AudioStation.Lyrics</code>）以及本机 <strong>歌词文本缓存</strong>（<code>LyricsTextCache</code>，来自此前在线拉取的结果）。</td>
+          </tr>
+          <tr>
+            <td><strong>关闭</strong></td>
+            <td><strong>不请求 NAS、不读歌词磁盘缓存</strong>，只尝试从<strong>本机已缓存的歌曲流文件</strong>里解析 <strong>内嵌歌词</strong>（如 ID3 <code>USLT</code>）。若当前曲尚未下载到本地流缓存，则可能没有歌词。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Q：「优先使用内嵌歌词」和「获取在线歌词」是什么关系？</h3>
+    <p class="answer-label">A：</p>
+    <p>「获取在线歌词」是总开关：关闭后<strong>不再</strong>走在线/缓存歌词链路，「优先使用内嵌」也不会再与 NAS 比较顺序（因为根本不会请求在线）。</p>
+    <p>「获取在线歌词」<strong>打开</strong>时：若「优先使用内嵌」为开，则<strong>先</strong>从本地流缓存文件读内嵌；没有或关闭「优先使用内嵌」时，再依次尝试本机歌词缓存、NAS 拉取。</p>
+
+    <h3>Q：什么是「歌词时间轴调整」？</h3>
+    <p class="answer-label">A：</p>
+    <p>用于微调歌词高亮与演唱听感不一致的情况：在设置里可输入带一位小数的秒数（也可点 ± 步进 <strong>0.1 s</strong>），范围 <strong>±300 s</strong>；负值略<strong>提前</strong>高亮，正值略<strong>延迟</strong>。保存后由全屏歌词与进度匹配逻辑（<code>PreferencesUtil.getLyricTimeOffsetSec</code> 等）统一应用。</p>
+
+    <h3>Q：应用内「常见问题」打开是空白或不是你们维护的页面？</h3>
+    <p class="answer-label">A：</p>
+    <p><code>FaqPage</code> 通过 <code>AppWebLinks.FAQ_URL</code> <strong>加载远程网页</strong>。请将本文件 <code>docs/常见问题.md</code> 的内容同步到该地址所指向的页面（例如部署本页 <code>faq.html</code>），或把 <code>Constants.AppWebLinks</code> 中的 URL 改成你实际部署的 FAQ 地址；修改后需重新编译应用。</p>
+  </section>
+
+  <footer>
+    <p><a href="index.html">应用介绍</a> · <a href="privacy.html">隐私政策</a> · <a href="terms.html">使用条款</a></p>
+    <p>© 2026 风琳 Player · 与 <code>docs/常见问题.md</code> 保持同步维护</p>
+  </footer>
+</main>
+</body>
+</html>
