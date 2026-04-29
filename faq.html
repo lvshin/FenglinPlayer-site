@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 访客向说明；与 docs/常见问题.md 中实现级细节如有出入，以代码与 md 为准。 -->
+<!-- 访客向说明；与实现细节如有出入，以应用代码与 README 为准。 -->
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="风琳 Player 常见问题：缓存与空间、音质与会员、歌词设置等。" />
+  <meta name="description" content="风琳 Player 常见问题：缓存与空间、音质与会员、Wi‑Fi 常听自动离线、歌词设置等。" />
   <title>风琳 Player — 常见问题</title>
   <style>
     :root {
@@ -339,6 +339,24 @@
     <h3>Q：源流和转码会长期各占一份吗？</h3>
     <p class="answer-label">A：</p>
     <p><strong>普通单曲</strong>在有了稳定的原始码流缓存后，应用会尽量<strong>删掉同一条歌里多余的那份转码文件</strong>以省空间；打开「本地歌曲」也会顺带整理历史遗留的双份。<strong>整碟类曲目</strong>按群晖规则只走转码链路，<strong>不会</strong>按上述方式删 MP3。</p>
+
+    <h3>Q：什么是「Wi‑Fi 下自动缓存常听歌曲」？什么时候会下载？</h3>
+    <p class="answer-label">A：</p>
+    <p>该功能<strong>仅有效会员</strong>可用，在<strong>设置 → 播放</strong>中打开开关；默认<strong>关闭</strong>。</p>
+    <ul>
+      <li><strong>网络</strong>：仅在当前网络视为 <strong>Wi‑Fi 或有线以太</strong>时才会尝试（与「非 Wi‑Fi 自动转码」对网络的划分方式一致）。</li>
+      <li><strong>账号</strong>：需要<strong>已登录</strong> NAS 且会话有效。</li>
+      <li><strong>选曲</strong>：按本机<strong>播放统计</strong>里与首页「最常播放」相同的排序，优先缓存您常听的曲目；已缓存过的、以及当前队列里正在显示的那一首会跳过。</li>
+      <li><strong>时机与带宽</strong>：仅在<strong>当前没有在播放</strong>，且<strong>不在「等首帧 / 网络缓冲」</strong>时才会后台串行下载；<strong>正在播放或缓冲时会自动停手</strong>，<strong>暂停且缓冲已结束</strong>时可以继续。回到前台、或暂停/停止后，有机会再次触发排队。</li>
+      <li><strong>节奏</strong>：两次整轮任务之间设有<strong>较长间隔</strong>（约数小时），曲目之间也会<strong>间隔数秒</strong>，减轻对 NAS 与当前使用的干扰。</li>
+      <li><strong>存储</strong>：文件落在本机<strong>离线下载</strong>目录，与全屏播控里「离线缓存」同源，会参与<strong>缓存上限</strong>合计统计；设置里的<strong>清理缓存</strong><strong>不会</strong>删除这类离线下载文件。</li>
+    </ul>
+    <p><strong>不会动 NAS 原件</strong>：只往手机写副本，<strong>不会</strong>修改或删除群晖里的音乐源文件。</p>
+
+    <h3>Q：已离线下载的歌曲可以分享吗？文件名是什么？</h3>
+    <p class="answer-label">A：</p>
+    <p>可以。在<strong>全屏正在播放</strong>或<strong>列表曲目菜单</strong>里，若该曲<strong>已存本地</strong>，第三格 / 「离线」相关入口会显示为<strong>分享</strong>（并标注已存本地）；点按后会通过系统分享面板发出<strong>音频文件</strong>。</p>
+    <p>为尽量与您在 NAS 上看到的一致，分享使用的文件名优先取<strong>歌曲在服务器上的路径中的最后一段</strong>（含扩展名）；若当时是无路径的在线拉流缓存下来的，则可能用<strong>曲目标题 + 根据音频封装推断的扩展名</strong>。应用会先在本机缓存目录内<strong>准备一份带该文件名的副本</strong>再交给系统分享，大文件可能需要稍等片刻。</p>
   </section>
 
   <hr />

@@ -69,6 +69,18 @@
       padding-left: 22px;
     }
     ul.feature-list li { margin: 8px 0; }
+    .feature-group {
+      margin-top: 20px;
+    }
+    .feature-group:first-of-type {
+      margin-top: 0;
+    }
+    .feature-group h3 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
     .meta-row {
       display: flex;
       flex-wrap: wrap;
@@ -132,15 +144,80 @@
 
     <div class="card">
       <h2>主要功能</h2>
-      <ul class="feature-list">
-        <li><strong>连接</strong>：支持 QuickConnect、域名或 IP、HTTPS，以及 DSM 二步验证；登录信息保存在本机。</li>
-        <li><strong>浏览与播放</strong>：歌曲、专辑、歌手、文件夹、搜索、「我最喜欢」与 NAS 歌单；支持锁屏与通知栏等媒体控制、蓝牙耳机与车机等外接播放、后台播放。</li>
-        <li><strong>体验</strong>：迷你播放条、全屏正在播放与歌词（可按设置从 NAS 或本机获取）、可选无损与省流量转码、封面与歌曲缓存及容量上限。</li>
-        <li><strong>播放统计</strong>：本机「最常 / 最近播放」；可在设置中选择与 NAS 双向同步播放历史（需开启同步并保存账户信息以便续期会话）。</li>
-        <li><strong>其他</strong>：在支持的设备上可随握持手型微调迷你条布局；会员可通过华为应用市场内购订阅与恢复。</li>
-      </ul>
+      <p>
+        下面是风琳 Player 已实现能力的概览，按日常用法整理，便于您快速判断是否适合自己的 NAS 听歌习惯。
+      </p>
+
+      <div class="feature-group">
+        <h3>连接 NAS</h3>
+        <ul class="feature-list">
+          <li>支持用 <strong>群晖 QuickConnect 短 ID</strong>、自定义域名或 IP 连接 NAS，可开启 HTTPS。</li>
+          <li>若 DSM 启用了<strong>二步验证</strong>，可在登录时输入一次性口令完成验证；常用账号可安全保存在本机，下次一键选用。</li>
+        </ul>
+      </div>
+
+      <div class="feature-group">
+        <h3>浏览你的音乐库</h3>
+        <ul class="feature-list">
+          <li><strong>首页</strong>：最近添加的专辑、最常播放 / 最近播放、全部歌手、全部专辑等入口，左右滑动切换，一次看清家里曲库。</li>
+          <li><strong>搜索</strong>：按关键词找歌曲、专辑、歌手。</li>
+          <li><strong>歌手页与专辑页</strong>：可整页按顺序或随机播放该艺人 / 该专辑的全部曲目。</li>
+          <li><strong>文件夹</strong>：像在文件管理器里一样按目录浏览 NAS 上的音乐文件。</li>
+          <li><strong>我最喜欢</strong>：集中展示你在 NAS 上标为满星的歌曲。</li>
+          <li><strong>NAS 歌单</strong>：查看 Audio Station 里的歌单，新建、改名、删除，并把歌曲加进歌单或从歌单里移除。</li>
+          <li><strong>本机「本地歌曲」</strong>：列出已在手机上<strong>完整缓存</strong>的临时流文件（与「离线下载到专属目录」是两套机制，列表含义以应用内说明为准）。</li>
+        </ul>
+      </div>
+
+      <div class="feature-group">
+        <h3>播放与控制</h3>
+        <ul class="feature-list">
+          <li><strong>全局播放</strong>：底部迷你条随时控制播放 / 暂停；点按可打开<strong>全屏「正在播放」</strong>，含大图封面与进度条。</li>
+          <li><strong>系统媒体控制</strong>：锁屏、通知栏、蓝牙耳机控制键等与播放状态联动；可切换外放 / 蓝牙等输出设备（由系统界面选择）。</li>
+          <li><strong>后台播放</strong>：切到别的应用或熄屏后，音乐可继续播放（取决于系统电量与策略设置）。</li>
+          <li><strong>断点记忆</strong>：关闭应用再打开，通常会恢复上次的队列与进度（具体以当前版本行为为准）。</li>
+          <li><strong>播放模式</strong>：列表循环、随机、单曲循环、顺序播完最后一首后停止等常用模式。</li>
+          <li><strong>曲目菜单（⋯）</strong>：可在列表里把某首<strong>插到当前曲下一首并立刻播</strong>，或<strong>排在当前曲之后</strong>不改变正在播的这首；可请求<strong>离线下载</strong>，若已存在本地文件还可<strong>系统分享</strong>。</li>
+          <li><strong>定时停止</strong>：全屏播放页可设定一段时间后自动暂停（如睡前听歌）。</li>
+          <li><strong>睡眠模式（会员）</strong>：可设倒计时并在结束前<strong>渐弱音量</strong>，适合入睡场景。</li>
+        </ul>
+      </div>
+
+      <div class="feature-group">
+        <h3>歌词与音质</h3>
+        <ul class="feature-list">
+          <li>支持<strong>逐行歌词</strong>与跟唱高亮；可在设置里选择是否从 NAS 拉歌词、是否优先用歌曲内嵌歌词，并对时间轴做微调。</li>
+          <li>可在设置中<strong>优先无损音质</strong>或让 NAS 侧转码为较小体积（省流量）；整轨专辑等个别类型可能仍走转码，以实际播放为准。</li>
+        </ul>
+      </div>
+
+      <div class="feature-group">
+        <h3>缓存、离线与省流量（会员部分能力）</h3>
+        <ul class="feature-list">
+          <li>播放时可将流媒体<strong>缓存在本机</strong>，重复收听更省网；可设置<strong>缓存总容量上限</strong>并一键清理（清理策略以应用内为准）。</li>
+          <li>在曲目菜单或全屏菜单中可将单首<strong>离线下载</strong>为本地文件（有 NAS 原始路径时优先完整文件，否则可能用流式方式保存）。</li>
+          <li>会员可开启：在非 Wi‑Fi 下按需<strong>自动使用较小码率</strong>（有本地缓存时仍优先本地）；在 Wi‑Fi 下按收听习惯<strong>自动缓存常听歌曲</strong>等能力。</li>
+        </ul>
+      </div>
+
+      <div class="feature-group">
+        <h3>收听统计与同步</h3>
+        <ul class="feature-list">
+          <li>应用会统计<strong>有效收听</strong>，用于「最常播放」等列表（门槛可在设置里调节）。</li>
+          <li>可选与 NAS 上您个人目录里的<strong>播放历史文件双向同步</strong>，多设备习惯接近时列表更一致（需在设置中开启并保持账号可用）。</li>
+        </ul>
+      </div>
+
+      <div class="feature-group">
+        <h3>体验与会员</h3>
+        <ul class="feature-list">
+          <li>在支持的机型上，迷你条可随<strong>握持左右手</strong>微调布局（方便单手点暂停和收藏）。</li>
+          <li>部分高级功能通过<strong>华为应用内订阅</strong>提供；可在应用内查看权益说明、购买与恢复购买。</li>
+        </ul>
+      </div>
+
       <div class="meta-row">
-        <span><strong>运行环境</strong>：HarmonyOS 手机 / 平板（以应用商店与系统提示为准）</span>
+        <span><strong>运行环境</strong>：HarmonyOS NEXT 手机 / 平板等（具体版本以应用商店与设备提示为准）</span>
       </div>
     </div>
 
