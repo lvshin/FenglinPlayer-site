@@ -196,6 +196,37 @@
   </header>
 
   <section>
+    <h2>账号与登录</h2>
+
+    <h3>Q：我的 NAS 密码保存在哪里？是明文吗？</h3>
+    <p class="answer-label">A：</p>
+    <p>
+      <strong>不是明文</strong>。每次登录成功后，应用会调用<strong>设备级硬件密钥服务（HarmonyOS Universal Keystore Service / HUKS）</strong>用<strong>AES-256-GCM</strong>对您的密码做加密，再把<strong>密文与一次性随机数</strong>写入应用偏好；明文密码仅在 App 运行期间临时解密到内存中，供「会话过期后<strong>静默续期</strong>」使用，进程结束即随之释放。密钥由系统在本机生成并绑定该设备，<strong>无法被导出</strong>，也不会上传到开发者服务器。
+    </p>
+    <p>
+      <strong>卸载应用、在设置里「退出登录」、清除应用数据或恢复出厂</strong>，密钥与密文都会一并失效——之后即使有人翻到了原偏好文件，也<strong>无法</strong>再还原出您当时的 NAS 密码。
+    </p>
+    <p>
+      请注意：上述保护针对的是「本机存储层」。同一台设备上拥有同一账户权限的其他应用、调试连接的电脑、或被授予无障碍 / Root 权限的 App，仍可能通过系统接口与运行中的 App 内存交互；请按 HarmonyOS 通行的设备安全建议，避免在不信任的设备上长期保存账号。
+    </p>
+
+    <h3>Q：登录页里「已保存账号」列表怎么删？能一次清空吗？</h3>
+    <p class="answer-label">A：</p>
+    <p>
+      在登录页点 <strong>NAS 地址</strong>行右侧的<strong>下拉菜单</strong>（最多列出 50 条历史成功登录），<strong>菜单底部</strong>有一项「<strong>管理已保存账号…</strong>」；点开会出现一个半模态：
+    </p>
+    <ul>
+      <li>每行可<strong>单独删除</strong>该条历史账号（含其加密后的密码）；</li>
+      <li>底部「<strong>全部清空</strong>」按钮可一次性清空所有已保存账号。</li>
+    </ul>
+    <p>
+      另外，<strong>退出登录</strong>会清除「当前」登录态与缓存，但保留「已保存账号」列表（方便您下次切回来）；要彻底移除某条历史登录，请用上面的「管理已保存账号…」入口；卸载 App 也会一并清掉本机所有相关数据。
+    </p>
+  </section>
+
+  <hr />
+
+  <section>
     <h2>缓存与存储</h2>
 
     <h3>Q：缓存超出「缓存上限」后，应用会怎么删文件？</h3>
