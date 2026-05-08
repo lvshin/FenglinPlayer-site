@@ -355,17 +355,20 @@
       width: 260px;
       height: 536px;
       border-radius: 42px;
-      background: #111827;
-      padding: 10px;
+      background: transparent;
       box-shadow:
         0 36px 80px rgba(25, 44, 91, 0.28),
         inset 0 0 0 1px rgba(255,255,255,0.16);
+      will-change: transform;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform-style: preserve-3d;
     }
 
     .phone.main {
       left: 94px;
       top: 26px;
-      transform: rotate(-2.5deg);
+      transform: rotate(-2.5deg) translateZ(0);
       z-index: 3;
     }
 
@@ -374,7 +377,7 @@
       top: 80px;
       width: 232px;
       height: 486px;
-      transform: rotate(5deg);
+      transform: rotate(5deg) translateZ(0);
       z-index: 2;
       opacity: 0.98;
     }
@@ -384,7 +387,20 @@
       height: 100%;
       border-radius: 33px;
       overflow: hidden;
-      background: linear-gradient(180deg, #f9fbff 0%, #edf4ff 100%);
+      transform: translateZ(0);
+    }
+
+    .screen-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+      transform: translateZ(0);
+      backface-visibility: hidden;
     }
 
     .island {
@@ -1419,61 +1435,20 @@
           </div>
         </div>
 
-        <div class="hero-art" aria-hidden="true">
-          <span class="orb o1"></span>
-          <span class="orb o2"></span>
-          <span class="orb o3"></span>
+        <div class="hero-art">
+          <span class="orb o1" aria-hidden="true"></span>
+          <span class="orb o2" aria-hidden="true"></span>
+          <span class="orb o3" aria-hidden="true"></span>
 
           <div class="phone main">
             <div class="screen">
-              <div class="island"></div>
-              <div class="status"><span>08:08</span><span>5G  100%</span></div>
-              <div class="player-ui">
-                <div class="album"></div>
-                <div class="song-title">
-                  <div>
-                    <h3>Dream It Possible</h3>
-                    <p class="artist">Delacey</p>
-                  </div>
-                  <span>♡</span>
-                </div>
-                <div class="tags">
-                  <span class="tag">FLAC</span>
-                  <span class="tag">24bit</span>
-                  <span class="tag">96kHz</span>
-                </div>
-                <div class="progress"><i></i></div>
-                <div class="time-row"><span>01:24</span><span>03:24</span></div>
-                <div class="controls">
-                  <span>↺</span><span>◀</span><span class="play">Ⅱ</span><span>▶</span><span>↻</span>
-                </div>
-              </div>
-              <div class="bottom-icons"><span>⌂</span><span>◎</span><span>♡</span><span>☰</span></div>
+              <img class="screen-img" src="screenshot_20260508_084155_cn.jpg" alt="风琳 Player 正在播放界面" />
             </div>
           </div>
 
           <div class="phone side">
             <div class="screen">
-              <div class="island"></div>
-              <div class="status"><span>08:58</span><span>Wi‑Fi</span></div>
-              <div class="library-ui">
-                <h3>音乐库</h3>
-                <div class="search">搜索音乐</div>
-                <div class="lib-list">
-                  <div class="lib-item"><span class="cover"></span><div><b>歌手</b><small>256 位歌手</small></div><span>›</span></div>
-                  <div class="lib-item"><span class="cover"></span><div><b>专辑</b><small>468 张专辑</small></div><span>›</span></div>
-                  <div class="lib-item"><span class="cover"></span><div><b>文件夹</b><small>128 个文件夹</small></div><span>›</span></div>
-                  <div class="lib-item"><span class="cover"></span><div><b>我最喜欢</b><small>163 首歌曲</small></div><span>›</span></div>
-                  <div class="lib-item"><span class="cover"></span><div><b>歌单</b><small>32 个歌单</small></div><span>›</span></div>
-                  <div class="lib-item"><span class="cover"></span><div><b>本地歌曲</b><small>已缓存在手机的曲目</small></div><span>›</span></div>
-                </div>
-              </div>
-              <div class="mini">
-                <span class="cover"></span>
-                <div style="flex:1"><b>Dream It Possible</b><small>Delacey</small></div>
-                <span>▶</span>
-              </div>
-              <div class="tabbar"><b>首页</b><span>搜索</span><span>播放</span><span>我的</span></div>
+              <img class="screen-img" src="screenshot_20260508_084206_cn.jpg" alt="风琳 Player 音乐库主页" />
             </div>
           </div>
         </div>
