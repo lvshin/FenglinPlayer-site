@@ -3,239 +3,1729 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="风琳 Player：群晖 DSM Audio Station（DS Audio）第三方客户端，连接 Synology NAS 浏览与播放自有音乐。" />
   <title>风琳 Player — 群晖音乐客户端</title>
+  <meta name="description" content="风琳 Player 是一款面向 HarmonyOS NEXT 的群晖 Audio Station 第三方音乐客户端，连接你的 NAS，随时随地畅听自己的音乐库。" />
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="apple-touch-icon" href="logo.png" />
   <style>
     :root {
-      --bg: #eef4fa;
-      --card: #ffffff;
-      --text: #1e2a3a;
-      --muted: #6b7c93;
-      --accent: #2f9ec4;
-      --accent-hover: #2589ad;
-      --border: #d4e0ed;
-      --shadow: rgba(24, 48, 72, 0.08);
+      --bg: #f4f8ff;
+      --card: rgba(255, 255, 255, 0.78);
+      --card-strong: rgba(255, 255, 255, 0.94);
+      --text: #0f1b35;
+      --muted: #637083;
+      --line: rgba(82, 132, 255, 0.18);
+      --primary: #3f7cff;
+      --primary-2: #6bd7ff;
+      --primary-3: #8e7cff;
+      --shadow: 0 22px 70px rgba(53, 98, 184, 0.16);
+      --shadow-soft: 0 12px 36px rgba(57, 101, 177, 0.10);
+      --radius-xl: 32px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --max: 1180px;
     }
-    * { box-sizing: border-box; }
-    body {
+
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
       min-height: 100vh;
-      background: linear-gradient(180deg, var(--bg) 0%, #d6e4f2 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-        "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 12% 5%, rgba(87, 199, 255, 0.28), transparent 30%),
+        radial-gradient(circle at 82% 14%, rgba(76, 116, 255, 0.22), transparent 33%),
+        radial-gradient(circle at 78% 70%, rgba(139, 119, 255, 0.16), transparent 34%),
+        linear-gradient(180deg, #f8fbff 0%, #eef5ff 42%, #f8fbff 100%);
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page::before,
+    .page::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      pointer-events: none;
+      border-radius: 999px;
+      filter: blur(2px);
+    }
+
+    .page::before {
+      width: 980px;
+      height: 420px;
+      left: -260px;
+      top: 420px;
+      background:
+        repeating-linear-gradient(
+          10deg,
+          rgba(79, 136, 255, 0.14) 0 1px,
+          transparent 1px 18px
+        );
+      transform: rotate(-8deg);
+      mask-image: radial-gradient(circle, #000 25%, transparent 72%);
+    }
+
+    .page::after {
+      width: 900px;
+      height: 900px;
+      right: -430px;
+      top: 40px;
+      background: radial-gradient(circle, rgba(93, 170, 255, 0.28), transparent 62%);
+    }
+
+    .nav-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: 12px 20px;
+      backdrop-filter: blur(20px);
+    }
+
+    .nav {
+      width: min(var(--max), 100%);
+      margin: 0 auto;
+      height: 72px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.74);
+      box-shadow: 0 12px 36px rgba(31, 77, 148, 0.10);
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px 0 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 850;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: linear-gradient(145deg, rgba(255,255,255,0.92), rgba(229,242,255,0.86));
+      box-shadow: inset 0 1px 0 #fff, 0 12px 30px rgba(60, 131, 255, 0.18);
+    }
+
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      font-size: 15px;
+      color: #22304a;
+      font-weight: 650;
+    }
+
+    .nav-links a {
+      opacity: 0.86;
+      transition: 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      opacity: 1;
+      color: var(--primary);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 16px;
+      padding: 13px 22px;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: 0.22s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, #3472ff 0%, #5b8fff 100%);
+      box-shadow: 0 14px 28px rgba(61, 119, 255, 0.32);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 34px rgba(61, 119, 255, 0.38);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.58);
+      color: #4e5a70;
+      border: 1px solid rgba(82, 132, 255, 0.18);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+
+    .section {
+      position: relative;
+      z-index: 1;
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      min-height: 690px;
+      padding: 62px 0 54px;
+      display: grid;
+      grid-template-columns: 1.02fr 0.98fr;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border: 1px solid rgba(71, 132, 255, 0.20);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.62);
+      color: #4166a5;
+      font-size: 14px;
+      font-weight: 750;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 22px;
+    }
+
+    .eyebrow i {
+      width: 8px;
+      height: 8px;
+      border-radius: 99px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow: 0 0 18px rgba(63,124,255,0.65);
+    }
+
+    .hero h1 {
+      font-size: clamp(28px, 3.4vw, 44px);
+      line-height: 1.2;
+      letter-spacing: -0.025em;
+      font-weight: 800;
+      max-width: 560px;
+    }
+
+    .grad {
+      background: linear-gradient(110deg, #256bff, #6b7cff 42%, #4bd7ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-desc {
+      margin-top: 18px;
+      max-width: 520px;
+      color: #59677f;
+      font-size: 15px;
+      line-height: 1.75;
+      font-weight: 450;
+    }
+
+    .hero-badges {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      max-width: 580px;
+      margin: 28px 0 26px;
+    }
+
+    .hero-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 70px;
+      padding: 13px;
+      background: rgba(255,255,255,0.62);
+      border: 1px solid rgba(91, 143, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(20px);
+    }
+
+    .icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+      background: linear-gradient(145deg, #fff, #eaf3ff);
+      box-shadow: inset 0 1px 0 #fff, 0 10px 22px rgba(66, 124, 244, 0.15);
+      flex: 0 0 auto;
+    }
+
+    .icon svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .hero-badge .desc {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .hero-badge .desc strong {
+      font-size: 13.5px;
+      margin-bottom: 3px;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    .hero-badge .desc span {
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .hero-art {
+      position: relative;
+      height: 650px;
+    }
+
+    .hero-art::before {
+      content: "";
+      position: absolute;
+      inset: 70px 0 0 18px;
+      border-radius: 48% 52% 45% 55%;
+      background:
+        radial-gradient(circle at 55% 48%, rgba(112, 172, 255, 0.30), transparent 38%),
+        radial-gradient(circle at 32% 70%, rgba(107, 215, 255, 0.20), transparent 34%),
+        linear-gradient(135deg, rgba(255,255,255,0.8), rgba(229,241,255,0.2));
+      filter: blur(0.5px);
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(94, 151, 255, 0.26);
+      box-shadow: 0 0 38px rgba(86, 155, 255, 0.35);
+    }
+
+    .orb.o1 { width: 18px; height: 18px; right: 20px; top: 150px; }
+    .orb.o2 { width: 12px; height: 12px; left: 18px; bottom: 170px; }
+    .orb.o3 { width: 34px; height: 34px; right: 112px; bottom: 84px; }
+
+    .phone {
+      position: absolute;
+      width: 260px;
+      height: 536px;
+      border-radius: 42px;
+      background: #111827;
+      padding: 10px;
+      box-shadow:
+        0 36px 80px rgba(25, 44, 91, 0.28),
+        inset 0 0 0 1px rgba(255,255,255,0.16);
+    }
+
+    .phone.main {
+      left: 94px;
+      top: 26px;
+      transform: rotate(-2.5deg);
+      z-index: 3;
+    }
+
+    .phone.side {
+      right: 10px;
+      top: 80px;
+      width: 232px;
+      height: 486px;
+      transform: rotate(5deg);
+      z-index: 2;
+      opacity: 0.98;
+    }
+
+    .screen {
+      position: relative;
+      height: 100%;
+      border-radius: 33px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #f9fbff 0%, #edf4ff 100%);
+    }
+
+    .island {
+      position: absolute;
+      left: 50%;
+      top: 9px;
+      width: 78px;
+      height: 22px;
+      transform: translateX(-50%);
+      background: #0f172a;
+      border-radius: 999px;
+      z-index: 4;
+    }
+
+    .status {
+      height: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 22px 0;
+      color: #1f2937;
+      font-size: 10px;
+      font-weight: 750;
+    }
+
+    .player-ui {
+      padding: 30px 20px 20px;
+    }
+
+    .album {
+      height: 198px;
+      border-radius: 28px;
+      overflow: hidden;
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(28,43,74,0.1), rgba(10,20,36,0.36)),
+        linear-gradient(135deg, #9cc9ff 0%, #ffd5e1 45%, #4f83b8 100%);
+      box-shadow: 0 18px 38px rgba(44, 88, 153, 0.20);
+      margin-bottom: 22px;
+    }
+
+    .album::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 45%;
+      background:
+        linear-gradient(165deg, transparent 20%, rgba(42,74,112,0.65) 21% 42%, transparent 43%),
+        linear-gradient(198deg, transparent 18%, rgba(21,51,88,0.7) 19% 45%, transparent 46%),
+        linear-gradient(180deg, transparent, rgba(255,255,255,0.6));
+      clip-path: polygon(0 75%, 18% 42%, 34% 66%, 52% 28%, 72% 70%, 92% 36%, 100% 72%, 100% 100%, 0 100%);
+    }
+
+    .album::after {
+      content: "Mountains";
+      position: absolute;
+      left: 24px;
+      top: 78px;
+      color: rgba(255,255,255,0.92);
+      font-size: 24px;
+      font-family: Georgia, serif;
+      font-style: italic;
+      text-shadow: 0 6px 24px rgba(0,0,0,0.2);
+    }
+
+    .song-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .song-title h3 {
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .song-title span {
+      color: #8b96aa;
+      font-size: 22px;
+    }
+
+    .artist {
+      color: #6f7b90;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .tags {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 28px;
+    }
+
+    .tag {
+      padding: 5px 8px;
+      border-radius: 9px;
+      background: rgba(63,124,255,0.08);
+      color: #3269df;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .progress {
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(92,112,143,0.15);
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    .progress i {
+      display: block;
+      width: 39%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #3d78ff, #6bd7ff);
+    }
+
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #758196;
+      margin-bottom: 24px;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #111827;
+    }
+
+    .play {
+      width: 58px;
+      height: 58px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      box-shadow: 0 12px 30px rgba(42, 85, 164, 0.18);
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .bottom-icons {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      color: #8b96aa;
+      font-size: 15px;
+    }
+
+    .library-ui {
+      padding: 32px 14px 16px;
+    }
+
+    .library-ui h3 {
+      font-size: 20px;
+      margin: 10px 4px 12px;
+    }
+
+    .search {
+      height: 34px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.045);
+      color: #9aa5b4;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+
+    .lib-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .lib-item {
+      display: grid;
+      grid-template-columns: 50px 1fr 18px;
+      gap: 10px;
+      align-items: center;
+      min-height: 58px;
+      padding: 7px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.64);
+      box-shadow: 0 8px 22px rgba(51,91,156,0.08);
+    }
+
+    .cover {
+      height: 50px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #2c66ff, #95d6ff);
+    }
+
+    .lib-item:nth-child(2) .cover { background: linear-gradient(135deg, #20243b, #f58aa6); }
+    .lib-item:nth-child(3) .cover { background: linear-gradient(135deg, #1c9da8, #aae7ff); }
+    .lib-item:nth-child(4) .cover { background: linear-gradient(135deg, #866bff, #ffc0db); }
+    .lib-item:nth-child(5) .cover { background: linear-gradient(135deg, #16213e, #80a4ff); }
+
+    .lib-item b {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+
+    .lib-item small {
+      color: #7a869a;
+      font-size: 10px;
+    }
+
+    .mini {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 58px;
+      min-height: 54px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.78);
+      box-shadow: 0 12px 30px rgba(35,75,146,0.18);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px;
+    }
+
+    .mini .cover {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 auto;
+    }
+
+    .mini b {
+      font-size: 11px;
+      display: block;
+    }
+
+    .mini small {
+      color: #7a869a;
+      font-size: 9px;
+    }
+
+    .tabbar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 52px;
+      background: rgba(255,255,255,0.82);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      align-items: center;
+      text-align: center;
+      color: #8a96aa;
+      font-size: 11px;
+    }
+
+    .tabbar b {
+      color: var(--primary);
+    }
+
+    .section-title {
+      text-align: center;
+      margin: 18px auto 28px;
+    }
+
+    .section-title h2 {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      font-size: clamp(24px, 3vw, 38px);
+      letter-spacing: -0.035em;
+      font-weight: 850;
+      color: #2b3a5c;
+      max-width: 100%;
+    }
+
+    .section-title h2 .wave {
+      width: clamp(80px, 14vw, 140px);
+      height: 22px;
+      flex-shrink: 0;
+      color: #7a96c8;
+      opacity: 0.85;
+    }
+    .section-title h2 .wave svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .section-title h2 .wave.wave-left svg {
+      transform: scaleX(-1);
+    }
+
+    .section-title p {
+      max-width: 680px;
+      margin: 12px auto 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    .features {
+      padding: 22px 0 52px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 14px;
+    }
+
+    .feature-card {
+      min-height: 184px;
+      padding: 22px 16px;
+      border: 1px solid rgba(78, 130, 255, 0.16);
+      background: rgba(255, 255, 255, 0.74);
+      border-radius: 24px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(16px);
+      text-align: center;
+      transition: 0.22s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 48px rgba(57, 101, 177, 0.15);
+    }
+
+    .feature-card .icon {
+      margin: 0 auto 16px;
+    }
+
+    .feature-card h3 {
+      font-size: 17px;
+      margin-bottom: 9px;
+    }
+
+    .feature-card p {
+      color: var(--muted);
+      font-size: 13px;
       line-height: 1.65;
+    }
+
+    .experience {
+      padding: 12px 0 56px;
+    }
+
+    .detail-list {
+      border: 1px solid rgba(78, 130, 255, 0.16);
+      background: rgba(255,255,255,0.56);
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(20px);
+    }
+
+    .detail-row {
+      display: grid;
+      grid-template-columns: 1fr 1.45fr;
+      min-height: 158px;
+      border-bottom: 1px solid rgba(78, 130, 255, 0.13);
+    }
+
+    .detail-row:last-child {
+      border-bottom: 0;
+    }
+
+    .detail-visual {
+      position: relative;
+      overflow: hidden;
+      min-height: 158px;
+      background:
+        radial-gradient(circle at 40% 40%, rgba(70, 137, 255, 0.22), transparent 42%),
+        linear-gradient(135deg, rgba(255,255,255,0.72), rgba(230,240,255,0.38));
+      display: grid;
+      place-items: center;
+    }
+
+    .detail-visual::before {
+      content: "";
+      position: absolute;
+      inset: 16px;
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,0.74);
+      pointer-events: none;
+    }
+
+    .detail-copy {
+      padding: 30px 36px;
+      background: rgba(255,255,255,0.52);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .detail-copy h3 {
+      font-size: 25px;
+      letter-spacing: -0.035em;
+      margin-bottom: 10px;
+    }
+
+    .detail-copy p {
+      color: #59677f;
+      line-height: 1.85;
       font-size: 16px;
     }
-    .wrap {
-      max-width: 880px;
-      margin: 0 auto;
-      padding: 48px 20px 72px;
+
+    .nas-ill {
+      width: 110px;
+      height: 100px;
+      border-radius: 24px;
+      background: linear-gradient(155deg, #143e83, #2e89ff);
+      box-shadow: 0 22px 50px rgba(42, 113, 234, 0.30);
+      position: relative;
     }
-    header {
-      text-align: center;
-      margin-bottom: 40px;
+
+    .nas-ill::before {
+      content: "";
+      position: absolute;
+      inset: 14px 18px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.25) 0 2px, transparent 2px 18px),
+        linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0.04));
+      border-radius: 14px;
     }
-    h1 {
-      margin: 0 0 12px;
-      font-size: clamp(26px, 5vw, 34px);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--text);
+
+    .nas-ill::after {
+      content: "✓";
+      position: absolute;
+      right: -20px;
+      bottom: -12px;
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.9);
+      color: #2f78ff;
+      font-weight: 900;
+      font-size: 24px;
+      box-shadow: 0 16px 34px rgba(50, 114, 230, 0.22);
     }
-    .tagline {
-      margin: 0;
-      color: var(--muted);
-      font-size: 1.05rem;
+
+    .icon-strip {
+      width: 320px;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      padding: 14px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.65);
+      box-shadow: 0 14px 36px rgba(44, 92, 175, 0.12);
     }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px 28px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 24px var(--shadow);
+
+    .strip-icon {
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+      background: linear-gradient(145deg, #fff, #eaf3ff);
+      font-weight: 900;
     }
-    .card h2 {
-      margin: 0 0 16px;
-      font-size: 1.15rem;
-      color: var(--text);
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 10px;
+
+    .mini-strip {
+      width: 330px;
+      display: grid;
+      gap: 12px;
     }
-    .card p { margin: 10px 0; }
-    ul.feature-list {
-      margin: 8px 0 0;
-      padding-left: 22px;
-    }
-    ul.feature-list li { margin: 8px 0; }
-    .feature-group {
-      margin-top: 20px;
-    }
-    .feature-group:first-of-type {
-      margin-top: 0;
-    }
-    .feature-group h3 {
-      margin: 0 0 10px;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-    .meta-row {
+
+    .mini-player-demo {
+      border-radius: 22px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.72);
+      box-shadow: 0 14px 36px rgba(44, 92, 175, 0.12);
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px 24px;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-      font-size: 14px;
-      color: var(--muted);
+      align-items: center;
+      justify-content: space-between;
     }
-    .meta-row span strong { color: var(--text); font-weight: 600; }
-    .links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px 20px;
-      justify-content: center;
-      margin-top: 32px;
-    }
-    .links a {
-      color: var(--accent);
-      font-weight: 600;
-      text-decoration: none;
-      border-bottom: 2px solid transparent;
-    }
-    .links a:hover {
-      color: var(--accent-hover);
-      border-bottom-color: var(--accent);
-    }
-    footer {
-      margin-top: 40px;
-      text-align: center;
+
+    .mini-player-demo b {
       font-size: 13px;
-      color: var(--muted);
+      display: block;
     }
-    .notice {
+
+    .mini-player-demo small {
+      color: #748096;
+      font-size: 11px;
+    }
+
+    .control-dots {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.52);
+      color: var(--primary);
+      font-weight: 900;
+    }
+
+    .lyrics-box {
+      width: 320px;
+      padding: 22px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.65);
+      box-shadow: 0 14px 36px rgba(44, 92, 175, 0.12);
+      color: #8a96aa;
+      line-height: 1.65;
+      font-size: 15px;
+    }
+
+    .lyrics-box b {
+      color: #2e73ff;
+      background: rgba(63,124,255,0.10);
+      border-radius: 8px;
+      padding: 0 5px;
+    }
+
+    .cloud-ill {
+      width: 260px;
+      height: 104px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(205,231,255,0.84));
+      box-shadow: 0 22px 50px rgba(65, 126, 229, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      color: var(--primary);
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .charts {
+      width: 320px;
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr 0.8fr;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .chart-card {
+      height: 108px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.66);
+      box-shadow: 0 14px 36px rgba(44, 92, 175, 0.12);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chart-card.line::before {
+      content: "";
+      position: absolute;
+      inset: 24px 18px;
+      background:
+        linear-gradient(135deg, transparent 38%, #5b8fff 39% 41%, transparent 42%),
+        linear-gradient(40deg, transparent 48%, #5b8fff 49% 51%, transparent 52%);
+    }
+
+    .chart-card.donut {
+      display: grid;
+      place-items: center;
+    }
+
+    .donut-ring {
+      width: 62px;
+      height: 62px;
+      border-radius: 999px;
+      background: conic-gradient(#3f7cff 0 76%, rgba(63,124,255,0.16) 76% 100%);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: #346adf;
+      font-size: 13px;
+    }
+
+    .donut-ring::before {
+      content: "";
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-radius: inherit;
+      background: #fff;
+    }
+
+    .donut-ring span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 76px;
+    }
+
+    .bars i {
+      flex: 1;
+      border-radius: 999px 999px 6px 6px;
+      background: linear-gradient(180deg, #6bd7ff, #3f7cff);
+    }
+
+    .bars i:nth-child(1) { height: 38%; }
+    .bars i:nth-child(2) { height: 64%; }
+    .bars i:nth-child(3) { height: 84%; }
+
+    .sleep-ill {
+      width: 320px;
+      height: 124px;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 70% 35%, rgba(255,255,255,0.55), transparent 18%),
+        linear-gradient(135deg, #244dca, #7bbcff);
+      box-shadow: 0 18px 44px rgba(66, 113, 225, 0.20);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sleep-ill::before {
+      content: "☾";
+      position: absolute;
+      left: 36px;
+      top: 20px;
+      font-size: 70px;
+      color: #fff;
+    }
+
+    .sleep-ill::after {
+      content: "♕";
+      position: absolute;
+      right: 52px;
+      bottom: 20px;
+      width: 68px;
+      height: 68px;
+      display: grid;
+      place-items: center;
+      border-radius: 24px;
+      color: #2c68ff;
+      background: rgba(255,255,255,0.78);
+      font-size: 34px;
+      box-shadow: 0 18px 40px rgba(20, 52, 140, 0.20);
+    }
+
+    .vip {
+      padding: 4px 0 56px;
+    }
+
+    .vip-card {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 0.9fr 1.2fr;
+      gap: 30px;
+      align-items: center;
+      min-height: 260px;
+      padding: 36px 44px;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(99, 145, 255, 0.20);
+      background:
+        radial-gradient(circle at 18% 45%, rgba(255,255,255,0.85), transparent 30%),
+        radial-gradient(circle at 78% 30%, rgba(111, 214, 255, 0.24), transparent 36%),
+        linear-gradient(135deg, rgba(237,242,255,0.86), rgba(255,255,255,0.78));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+    }
+
+    .vip-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -120px -120px auto;
+      width: 380px;
+      height: 380px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(63,124,255,0.20), transparent 62%);
+    }
+
+    .crown {
+      width: 230px;
+      height: 170px;
+      margin: 0 auto;
+      position: relative;
+      display: grid;
+      place-items: end center;
+    }
+
+    .crown::before {
+      content: "♕";
+      position: absolute;
+      top: -6px;
+      color: rgba(255,255,255,0.95);
+      font-size: 116px;
+      line-height: 1;
+      text-shadow:
+        0 0 22px rgba(80, 126, 255, 0.22),
+        0 22px 52px rgba(60, 111, 220, 0.22);
+    }
+
+    .crown::after {
+      content: "";
+      width: 180px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.64);
+      box-shadow: 0 14px 36px rgba(72, 116, 216, 0.16);
+    }
+
+    .vip-copy {
+      position: relative;
+      z-index: 1;
+    }
+
+    .vip-copy h2 {
+      font-size: 40px;
+      letter-spacing: -0.04em;
+      margin-bottom: 10px;
+    }
+
+    .vip-copy p {
+      color: #59677f;
+      font-size: 17px;
+      line-height: 1.8;
+      margin-bottom: 22px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 15px;
+      border-radius: 15px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(92, 143, 255, 0.15);
+      color: #34527f;
+      font-weight: 750;
       font-size: 14px;
-      color: var(--muted);
+      box-shadow: 0 8px 22px rgba(57, 101, 177, 0.08);
+    }
+
+    .trust {
+      padding: 4px 0 64px;
+    }
+
+    .trust-card {
+      display: grid;
+      grid-template-columns: 0.72fr 1.28fr;
+      gap: 30px;
+      align-items: center;
+      padding: 38px 48px;
+      border-radius: var(--radius-xl);
+      background: rgba(255,255,255,0.76);
+      border: 1px solid rgba(78, 130, 255, 0.16);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(18px);
+    }
+
+    .shield {
+      width: 190px;
+      height: 190px;
+      margin: 0 auto;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        repeating-conic-gradient(from 0deg, rgba(63,124,255,0.12) 0 8deg, transparent 8deg 18deg),
+        radial-gradient(circle, rgba(255,255,255,0.92) 42%, rgba(227,240,255,0.60) 43% 100%);
+      box-shadow: inset 0 0 0 1px rgba(63,124,255,0.13), 0 18px 44px rgba(60, 117, 220, 0.12);
+      color: var(--primary);
+      font-size: 72px;
+      font-weight: 900;
+    }
+
+    .trust-copy h2 {
+      font-size: 34px;
+      letter-spacing: -0.04em;
+      margin-bottom: 14px;
+    }
+
+    .trust-copy p {
+      color: #59677f;
+      font-size: 16px;
+      line-height: 1.9;
+      margin-bottom: 10px;
+    }
+
+    .trust-note {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      color: #6c7890;
+      font-size: 14px;
+      line-height: 1.7;
       margin-top: 12px;
+    }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid rgba(78, 130, 255, 0.12);
+      background: rgba(255,255,255,0.58);
+      backdrop-filter: blur(16px);
+    }
+
+    .footer-inner {
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      color: #68758b;
+      font-size: 14px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 16px;
+      white-space: nowrap;
+    }
+
+    .footer-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 18px;
+      text-align: right;
+    }
+
+    @media (max-width: 1080px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 42px;
+      }
+
+      .hero-art {
+        height: 620px;
+      }
+
+      .phone.main {
+        left: 20%;
+      }
+
+      .phone.side {
+        right: 17%;
+      }
+
+      .feature-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .detail-row {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-visual {
+        min-height: 190px;
+      }
+
+      .nav-links {
+        gap: 20px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .nav {
+        height: auto;
+        padding: 14px;
+        gap: 12px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .brand {
+        font-size: 19px;
+      }
+
+      .hero {
+        padding-top: 24px;
+      }
+
+      .hero-badges {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .hero-art {
+        height: 520px;
+        transform: scale(0.82);
+        transform-origin: top center;
+        margin-bottom: -80px;
+      }
+
+      .phone.main {
+        left: 4%;
+      }
+
+      .phone.side {
+        right: 0;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .vip-card,
+      .trust-card {
+        grid-template-columns: 1fr;
+        padding: 28px 22px;
+      }
+
+      .vip-copy h2 {
+        font-size: 32px;
+      }
+
+      .trust-copy h2 {
+        font-size: 28px;
+      }
+
+      .detail-copy {
+        padding: 26px 22px;
+      }
+
+      .detail-copy h3 {
+        font-size: 22px;
+      }
+
+      .icon-strip,
+      .mini-strip,
+      .lyrics-box,
+      .charts,
+      .sleep-ill {
+        width: min(320px, calc(100vw - 90px));
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 22px 0;
+      }
+
+      .footer-meta {
+        text-align: left;
+        justify-content: flex-start;
+      }
     }
   </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <header>
-      <h1>风琳 Player</h1>
-      <p class="tagline">
-        风琳 Player 是群晖 DSM 上 Audio Station（DS Audio）的第三方客户端：在您的设备上连接 Synology NAS，浏览与播放自有音乐库。
-      </p>
+  <div class="page">
+    <header class="nav-wrap">
+      <nav class="nav" aria-label="主导航">
+        <a class="brand" href="#">
+          <span class="logo">
+            <img src="logo.png" alt="风琳 Player" />
+          </span>
+          风琳 Player
+        </a>
+
+        <div class="nav-links">
+          <a href="#features">功能</a>
+          <a href="#vip">会员</a>
+          <a href="faq.html">常见问题</a>
+          <a href="privacy.html">隐私政策</a>
+          <a href="terms.html">使用条款</a>
+        </div>
+
+        <a class="btn btn-primary" href="#features">立即体验</a>
+      </nav>
     </header>
 
-    <div class="card">
-      <h2>应用定位</h2>
-      <p>
-        风琳 Player <strong>不提供</strong>任何在线曲库、版权音乐内容或下载服务。您听到的曲目与封面均来自您本人拥有合法访问权限的
-        <strong>群晖 DSM / Audio Station</strong> 媒体索引与存储；本应用通过官方接口拉取列表与播放地址，不托管您的文件。
-      </p>
-      <p class="notice">
-        Synology、DSM、Audio Station 等为群晖科技有限公司商标；本应用非群晖官方产品，与群晖无隶属关系。
-      </p>
-    </div>
+    <main>
+      <section class="section hero">
+        <div>
+          <div class="eyebrow"><i></i>HarmonyOS NEXT · 群晖 Audio Station 第三方客户端</div>
+          <h1>让你的 NAS 音乐库，<br />在 <span class="grad">HarmonyOS</span> 上优雅流淌</h1>
+          <p class="hero-desc">连接你的群晖 NAS，随时随地畅听自己的音乐库。风琳 Player 专注本地收藏、无损播放、歌词体验与多设备习惯同步。</p>
 
-    <div class="card">
-      <h2>主要功能</h2>
-      <p>
-        下面是风琳 Player 已实现能力的概览，按日常用法整理，便于您快速判断是否适合自己的 NAS 听歌习惯。
-      </p>
+          <div class="hero-badges">
+            <div class="hero-badge">
+              <span class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3 5 6v5c0 4.5 2.9 8.5 7 10 4.1-1.5 7-5.5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/></svg>
+              </span>
+              <div class="desc"><strong>安全连接</strong><span>支持 QuickConnect / 域名 / IP</span></div>
+            </div>
+            <div class="hero-badge">
+              <span class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M5 12h2l2-4 3 8 2-6 2 2h3"/></svg>
+              </span>
+              <div class="desc"><strong>高品质播放</strong><span>无损优先，音质出色</span></div>
+            </div>
+            <div class="hero-badge">
+              <span class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 16.5a4.5 4.5 0 0 0-4-4.47A6 6 0 1 0 7 16.5"/><path d="M12 12v8"/><path d="m9 17 3 3 3-3"/></svg>
+              </span>
+              <div class="desc"><strong>离线畅听</strong><span>缓存下载，随时可听</span></div>
+            </div>
+          </div>
 
-      <div class="feature-group">
-        <h3>连接 NAS</h3>
-        <ul class="feature-list">
-          <li>支持用 <strong>群晖 QuickConnect 短 ID</strong>、自定义域名或 IP 连接 NAS，可开启 HTTPS。</li>
-          <li>若 DSM 启用了<strong>二步验证</strong>，可在登录时输入一次性口令完成验证；常用账号可安全保存在本机，下次一键选用。</li>
-        </ul>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#features">立即体验</a>
+            <a class="btn btn-ghost" href="#trust">了解更多 ›</a>
+          </div>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+          <span class="orb o1"></span>
+          <span class="orb o2"></span>
+          <span class="orb o3"></span>
+
+          <div class="phone main">
+            <div class="screen">
+              <div class="island"></div>
+              <div class="status"><span>08:08</span><span>5G  100%</span></div>
+              <div class="player-ui">
+                <div class="album"></div>
+                <div class="song-title">
+                  <div>
+                    <h3>Dream It Possible</h3>
+                    <p class="artist">Delacey</p>
+                  </div>
+                  <span>♡</span>
+                </div>
+                <div class="tags">
+                  <span class="tag">FLAC</span>
+                  <span class="tag">24bit</span>
+                  <span class="tag">96kHz</span>
+                </div>
+                <div class="progress"><i></i></div>
+                <div class="time-row"><span>01:24</span><span>03:24</span></div>
+                <div class="controls">
+                  <span>↺</span><span>◀</span><span class="play">Ⅱ</span><span>▶</span><span>↻</span>
+                </div>
+              </div>
+              <div class="bottom-icons"><span>⌂</span><span>◎</span><span>♡</span><span>☰</span></div>
+            </div>
+          </div>
+
+          <div class="phone side">
+            <div class="screen">
+              <div class="island"></div>
+              <div class="status"><span>08:58</span><span>Wi‑Fi</span></div>
+              <div class="library-ui">
+                <h3>音乐库</h3>
+                <div class="search">搜索音乐</div>
+                <div class="lib-list">
+                  <div class="lib-item"><span class="cover"></span><div><b>歌手</b><small>256 位歌手</small></div><span>›</span></div>
+                  <div class="lib-item"><span class="cover"></span><div><b>专辑</b><small>468 张专辑</small></div><span>›</span></div>
+                  <div class="lib-item"><span class="cover"></span><div><b>文件夹</b><small>128 个文件夹</small></div><span>›</span></div>
+                  <div class="lib-item"><span class="cover"></span><div><b>我最喜欢</b><small>163 首歌曲</small></div><span>›</span></div>
+                  <div class="lib-item"><span class="cover"></span><div><b>歌单</b><small>32 个歌单</small></div><span>›</span></div>
+                  <div class="lib-item"><span class="cover"></span><div><b>本地歌曲</b><small>已缓存在手机的曲目</small></div><span>›</span></div>
+                </div>
+              </div>
+              <div class="mini">
+                <span class="cover"></span>
+                <div style="flex:1"><b>Dream It Possible</b><small>Delacey</small></div>
+                <span>▶</span>
+              </div>
+              <div class="tabbar"><b>首页</b><span>搜索</span><span>播放</span><span>我的</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="section features">
+        <div class="section-title">
+          <h2>
+            <span class="wave wave-left" aria-hidden="true">
+              <svg viewBox="0 0 130 22" fill="none">
+                <line x1="0" y1="11" x2="78" y2="11" stroke="currentColor" stroke-opacity=".4" stroke-width="1"/>
+                <g fill="currentColor">
+                  <rect x="82"  y="9.5" width="1.8" height="3"  rx="1"/>
+                  <rect x="86"  y="7"   width="1.8" height="8"  rx="1"/>
+                  <rect x="90"  y="4"   width="1.8" height="14" rx="1"/>
+                  <rect x="94"  y="2"   width="1.8" height="18" rx="1"/>
+                  <rect x="98"  y="5"   width="1.8" height="12" rx="1"/>
+                  <rect x="102" y="8"   width="1.8" height="6"  rx="1"/>
+                  <rect x="106" y="3"   width="1.8" height="16" rx="1"/>
+                  <rect x="110" y="6"   width="1.8" height="10" rx="1"/>
+                  <rect x="114" y="9"   width="1.8" height="4"  rx="1"/>
+                  <rect x="118" y="10"  width="1.8" height="2"  rx="1"/>
+                </g>
+              </svg>
+            </span>
+            核心功能亮点
+            <span class="wave wave-right" aria-hidden="true">
+              <svg viewBox="0 0 130 22" fill="none">
+                <line x1="0" y1="11" x2="78" y2="11" stroke="currentColor" stroke-opacity=".4" stroke-width="1"/>
+                <g fill="currentColor">
+                  <rect x="82"  y="9.5" width="1.8" height="3"  rx="1"/>
+                  <rect x="86"  y="7"   width="1.8" height="8"  rx="1"/>
+                  <rect x="90"  y="4"   width="1.8" height="14" rx="1"/>
+                  <rect x="94"  y="2"   width="1.8" height="18" rx="1"/>
+                  <rect x="98"  y="5"   width="1.8" height="12" rx="1"/>
+                  <rect x="102" y="8"   width="1.8" height="6"  rx="1"/>
+                  <rect x="106" y="3"   width="1.8" height="16" rx="1"/>
+                  <rect x="110" y="6"   width="1.8" height="10" rx="1"/>
+                  <rect x="114" y="9"   width="1.8" height="4"  rx="1"/>
+                  <rect x="118" y="10"  width="1.8" height="2"  rx="1"/>
+                </g>
+              </svg>
+            </span>
+          </h2>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1"/><path d="M14 11a5 5 0 0 0-7.1 0l-2 2a5 5 0 0 0 7.1 7.1l1.1-1.1"/></svg></div>
+            <h3>连接 NAS</h3>
+            <p>多种连接方式，快速安全访问你的群晖 NAS。</p>
+          </article>
+          <article class="feature-card">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h6l2 2h8v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z"/></svg></div>
+            <h3>浏览音乐库</h3>
+            <p>多维度浏览，轻松找到想听的每一首歌。</p>
+          </article>
+          <article class="feature-card">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+            <h3>播放与控制</h3>
+            <p>丰富的播放控制，让聆听随心所欲。</p>
+          </article>
+          <article class="feature-card">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 18V6h5"/><path d="M7 10h10"/><path d="M14 6h6v12"/><path d="M9 18h6"/></svg></div>
+            <h3>歌词与音质</h3>
+            <p>逐行歌词与无损音质，沉浸每一刻。</p>
+          </article>
+          <article class="feature-card">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v11"/><path d="m8 10 4 4 4-4"/><path d="M5 20h14"/></svg></div>
+            <h3>缓存与离线</h3>
+            <p>智能缓存与离线下载，无网也能畅听。</p>
+          </article>
+          <article class="feature-card">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20V7"/></svg></div>
+            <h3>统计与同步</h3>
+            <p>聆听统计与播放记录，与 NAS 同步。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section experience">
+        <div class="section-title">
+          <h2>
+            <span class="wave wave-left" aria-hidden="true">
+              <svg viewBox="0 0 130 22" fill="none">
+                <line x1="0" y1="11" x2="78" y2="11" stroke="currentColor" stroke-opacity=".4" stroke-width="1"/>
+                <g fill="currentColor">
+                  <rect x="82"  y="9.5" width="1.8" height="3"  rx="1"/>
+                  <rect x="86"  y="7"   width="1.8" height="8"  rx="1"/>
+                  <rect x="90"  y="4"   width="1.8" height="14" rx="1"/>
+                  <rect x="94"  y="2"   width="1.8" height="18" rx="1"/>
+                  <rect x="98"  y="5"   width="1.8" height="12" rx="1"/>
+                  <rect x="102" y="8"   width="1.8" height="6"  rx="1"/>
+                  <rect x="106" y="3"   width="1.8" height="16" rx="1"/>
+                  <rect x="110" y="6"   width="1.8" height="10" rx="1"/>
+                  <rect x="114" y="9"   width="1.8" height="4"  rx="1"/>
+                  <rect x="118" y="10"  width="1.8" height="2"  rx="1"/>
+                </g>
+              </svg>
+            </span>
+            更强大的使用体验
+            <span class="wave wave-right" aria-hidden="true">
+              <svg viewBox="0 0 130 22" fill="none">
+                <line x1="0" y1="11" x2="78" y2="11" stroke="currentColor" stroke-opacity=".4" stroke-width="1"/>
+                <g fill="currentColor">
+                  <rect x="82"  y="9.5" width="1.8" height="3"  rx="1"/>
+                  <rect x="86"  y="7"   width="1.8" height="8"  rx="1"/>
+                  <rect x="90"  y="4"   width="1.8" height="14" rx="1"/>
+                  <rect x="94"  y="2"   width="1.8" height="18" rx="1"/>
+                  <rect x="98"  y="5"   width="1.8" height="12" rx="1"/>
+                  <rect x="102" y="8"   width="1.8" height="6"  rx="1"/>
+                  <rect x="106" y="3"   width="1.8" height="16" rx="1"/>
+                  <rect x="110" y="6"   width="1.8" height="10" rx="1"/>
+                  <rect x="114" y="9"   width="1.8" height="4"  rx="1"/>
+                  <rect x="118" y="10"  width="1.8" height="2"  rx="1"/>
+                </g>
+              </svg>
+            </span>
+          </h2>
+        </div>
+
+        <div class="detail-list">
+          <article class="detail-row">
+            <div class="detail-visual"><div class="nas-ill"></div></div>
+            <div class="detail-copy">
+              <h3>稳定安全的连接方式</h3>
+              <p>支持 QuickConnect / 域名 / IP / HTTPS，兼容 2FA（两步验证）。灵活适配你的网络环境，安全可靠，连接无忧。</p>
+            </div>
+          </article>
+
+          <article class="detail-row">
+            <div class="detail-visual">
+              <div class="icon-strip">
+                <span class="strip-icon">⌂</span><span class="strip-icon">⌕</span><span class="strip-icon">🎙</span><span class="strip-icon">◉</span><span class="strip-icon">▣</span><span class="strip-icon">♡</span><span class="strip-icon">☰</span>
+              </div>
+            </div>
+            <div class="detail-copy">
+              <h3>丰富的音乐库浏览</h3>
+              <p>首页、搜索、歌手、专辑、文件夹、我最喜欢、歌单…… 多维度浏览，快速定位你想听的音乐。</p>
+            </div>
+          </article>
+
+          <article class="detail-row">
+            <div class="detail-visual">
+              <div class="mini-strip">
+                <div class="mini-player-demo">
+                  <div><b>Dream It Possible</b><small>Delacey</small></div>
+                  <div>◀ Ⅱ ▶</div>
+                </div>
+                <div class="control-dots"><span>↺</span><span>↻</span><span>⊕</span><span>⇄</span><span>☰</span></div>
+              </div>
+            </div>
+            <div class="detail-copy">
+              <h3>多样的播放与控制</h3>
+              <p>Mini 播放器、全屏播放器、锁屏控制、蓝牙控制、播放模式。支持“插入下一首”、“在当前歌曲之后播放”等队列操作。</p>
+            </div>
+          </article>
+
+          <article class="detail-row">
+            <div class="detail-visual">
+              <div class="lyrics-box">
+                I will run, I will climb, I will soar<br />
+                I’m undefeated<br />
+                <b>Jumping out of my skin, pull the chord</b><br />
+                Yeah, I believe it
+              </div>
+            </div>
+            <div class="detail-copy">
+              <h3>歌词与音质体验</h3>
+              <p>逐行歌词。无损优先播放，按需转码，兼顾音质与设备兼容性。</p>
+            </div>
+          </article>
+
+          <article class="detail-row">
+            <div class="detail-visual"><div class="cloud-ill"><span>⌁</span><span>↓</span><span>✈</span></div></div>
+            <div class="detail-copy">
+              <h3>缓存与离线畅听</h3>
+              <p>本地缓存、离线下载、Wi‑Fi 自动缓存常听歌曲。智能省流模式，非 Wi‑Fi 网络也能更省流量。</p>
+            </div>
+          </article>
+
+          <article class="detail-row">
+            <div class="detail-visual">
+              <div class="charts">
+                <div class="chart-card line"></div>
+                <div class="chart-card donut"><div class="donut-ring"><span>76%</span></div></div>
+                <div class="chart-card"><div class="bars"><i></i><i></i><i></i></div></div>
+              </div>
+            </div>
+            <div class="detail-copy">
+              <h3>统计与同步</h3>
+              <p>聆听统计，了解你的音乐喜好。播放记录与 NAS 历史同步，跨设备无缝衔接。</p>
+            </div>
+          </article>
+
+          <article class="detail-row">
+            <div class="detail-visual"><div class="sleep-ill"></div></div>
+            <div class="detail-copy">
+              <h3>睡眠模式与会员能力</h3>
+              <p>睡眠模式，安心入眠不间断。会员享受更多高级能力，打造更优雅的聆听体验。</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="vip" class="section vip">
+        <div class="vip-card">
+          <div class="crown" aria-hidden="true"></div>
+          <div class="vip-copy">
+            <h2>风琳 VIP</h2>
+            <p>解锁更多高级能力，享受更优雅的音乐生活。</p>
+            <div class="chips">
+              <span class="chip">🌙 睡眠模式</span>
+              <span class="chip">💧 非 Wi‑Fi 智能省流</span>
+              <span class="chip">📶 Wi‑Fi 自动缓存常听歌曲</span>
+              <span class="chip">💎 更多高级能力</span>
+            </div>
+            <a class="btn btn-primary" href="#features">了解会员权益</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="trust" class="section trust">
+        <div class="trust-card">
+          <div class="shield" aria-hidden="true">✓</div>
+          <div class="trust-copy">
+            <h2>你的音乐，你做主，安全可靠</h2>
+            <p>风琳 Player 是第三方客户端，仅用于连接并播放你在群晖 NAS 的 Audio Station 中拥有并已授权的个人音乐库。我们不提供任何在线曲库，也不运营「点歌即播」的公有云服务。首次打开应用需阅读并同意隐私政策与使用条款；NAS 账号密码保存在手机本地并加密，卸载应用后一并清除。</p>
+            <div class="trust-note">
+              <span>ⓘ</span>
+              <span>Synology、DSM、Audio Station 等为群晖科技有限公司商标；本应用非群晖官方产品，与 Synology Inc. 无任何关联。</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer id="faq">
+      <div class="footer-inner">
+        <div class="footer-links">
+          <a href="faq.html">常见问题</a>
+          <span>|</span>
+          <a href="privacy.html">隐私政策</a>
+          <span>|</span>
+          <a href="terms.html">使用条款</a>
+        </div>
+        <div class="footer-meta">
+          <span>开发者：吕洋</span>
+          <span>联系邮箱：39808850@qq.com</span>
+          <span>© 2026 风琳 Player</span>
+        </div>
       </div>
-
-      <div class="feature-group">
-        <h3>浏览你的音乐库</h3>
-        <ul class="feature-list">
-          <li><strong>首页</strong>：最近添加的专辑、最常播放 / 最近播放、全部歌手、全部专辑等入口，左右滑动切换，一次看清家里曲库。</li>
-          <li><strong>搜索</strong>：按关键词找歌曲、专辑、歌手。</li>
-          <li><strong>歌手页与专辑页</strong>：可整页按顺序或随机播放该艺人 / 该专辑的全部曲目。</li>
-          <li><strong>文件夹</strong>：像在文件管理器里一样按目录浏览 NAS 上的音乐文件。</li>
-          <li><strong>我最喜欢</strong>：集中展示你在 NAS 上标为满星的歌曲。</li>
-          <li><strong>NAS 歌单</strong>：查看 Audio Station 里的歌单，新建、改名、删除，并把歌曲加进歌单或从歌单里移除。</li>
-          <li><strong>本机「本地歌曲」</strong>：列出已在手机上<strong>完整缓存</strong>的临时流文件（与「离线下载到专属目录」是两套机制，列表含义以应用内说明为准）。</li>
-        </ul>
-      </div>
-
-      <div class="feature-group">
-        <h3>播放与控制</h3>
-        <ul class="feature-list">
-          <li><strong>全局播放</strong>：底部迷你条随时控制播放 / 暂停；点按可打开<strong>全屏「正在播放」</strong>，含大图封面与进度条。</li>
-          <li><strong>系统媒体控制</strong>：锁屏、通知栏、蓝牙耳机控制键等与播放状态联动；可切换外放 / 蓝牙等输出设备（由系统界面选择）。</li>
-          <li><strong>后台播放</strong>：切到别的应用或熄屏后，音乐可继续播放（取决于系统电量与策略设置）。</li>
-          <li><strong>断点记忆</strong>：关闭应用再打开，通常会恢复上次的队列与进度（具体以当前版本行为为准）。</li>
-          <li><strong>播放模式</strong>：列表循环、随机、单曲循环、顺序播完最后一首后停止等常用模式。</li>
-          <li><strong>曲目菜单（⋯）</strong>：可在列表里把某首<strong>插到当前曲下一首并立刻播</strong>，或<strong>排在当前曲之后</strong>不改变正在播的这首；可请求<strong>离线下载</strong>，若已存在本地文件还可<strong>系统分享</strong>。</li>
-          <li><strong>定时停止</strong>：全屏播放页可设定一段时间后自动暂停（如睡前听歌）。</li>
-          <li><strong>睡眠模式（会员）</strong>：可设倒计时并在结束前<strong>渐弱音量</strong>，适合入睡场景。</li>
-        </ul>
-      </div>
-
-      <div class="feature-group">
-        <h3>歌词与音质</h3>
-        <ul class="feature-list">
-          <li>支持<strong>逐行歌词</strong>与跟唱高亮；可在设置里选择是否从 NAS 拉歌词、是否优先用歌曲内嵌歌词，并对时间轴做微调。</li>
-          <li>可在设置中<strong>优先无损音质</strong>或让 NAS 侧转码为较小体积（省流量）；整轨专辑等个别类型可能仍走转码，以实际播放为准。</li>
-        </ul>
-      </div>
-
-      <div class="feature-group">
-        <h3>缓存、离线与省流量（会员部分能力）</h3>
-        <ul class="feature-list">
-          <li>播放时可将流媒体<strong>缓存在本机</strong>，重复收听更省网；可设置<strong>缓存总容量上限</strong>并一键清理（清理策略以应用内为准）。</li>
-          <li>在曲目菜单或全屏菜单中可将单首<strong>离线下载</strong>为本地文件（有 NAS 原始路径时优先完整文件，否则可能用流式方式保存）。</li>
-          <li>会员可开启：在非 Wi‑Fi 下按需<strong>自动使用较小码率</strong>（有本地缓存时仍优先本地）；在 Wi‑Fi 下按收听习惯<strong>自动缓存常听歌曲</strong>等能力。</li>
-        </ul>
-      </div>
-
-      <div class="feature-group">
-        <h3>收听统计与同步</h3>
-        <ul class="feature-list">
-          <li>应用会统计<strong>有效收听</strong>，用于「最常播放」等列表（门槛可在设置里调节）。</li>
-          <li>可选与 NAS 上您个人目录里的<strong>播放历史文件双向同步</strong>，多设备习惯接近时列表更一致（需在设置中开启并保持账号可用）。</li>
-        </ul>
-      </div>
-
-      <div class="feature-group">
-        <h3>体验与会员</h3>
-        <ul class="feature-list">
-          <li>在支持的机型上，迷你条可随<strong>握持左右手</strong>微调布局（方便单手点暂停和收藏）。</li>
-          <li>部分高级功能通过<strong>华为应用内订阅</strong>提供；可在应用内查看权益说明、购买与恢复购买。</li>
-        </ul>
-      </div>
-
-      <div class="meta-row">
-        <span><strong>运行环境</strong>：HarmonyOS NEXT 手机 / 平板（适配中）等（具体版本以应用商店与设备提示为准）</span>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>文档与声明</h2>
-      <p>
-        以下页面说明使用中的疑问、个人信息处理与权责关系。应用内会以网页形式打开（地址以您安装版本配置为准）。
-      </p>
-      <nav class="links">
-        <a href="faq.html">常见问题</a>
-        <a href="privacy.html">隐私政策</a>
-        <a href="terms.html">使用条款</a>
-      </nav>
-    </div>
-
-    <footer>
-      <p>开发者：吕洋 · 联系邮箱：39808850@qq.com</p>
-      <p>© 2026 风琳 Player · 不构成对任何音乐内容的授权或许可</p>
     </footer>
   </div>
 </body>
